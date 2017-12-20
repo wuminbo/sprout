@@ -1,6 +1,6 @@
 #include "application.h"
 #include "SDL.h"
-
+#include "SdlDraw.h"
 application::application(void)
 {
 }
@@ -50,7 +50,8 @@ int SDLCALL video_process(void * data)
         //使用模拟数据填充像素值  
         fill_color_rgba8888();  
         //使用像素值更新纹理  
-		
+		SdlDraw::getInstance()->draw(frame.data);
+		SDL_Delay(1000);
     }  
   
     return 0;  

@@ -6,7 +6,7 @@ class SdlDraw
 public:
 	SdlDraw(void);
 	~SdlDraw(void);
-	void init(const char *title = "sprout", const int width = 300, const int height = 300);
+	void init(const char *title, const int width, const int height);
 	void draw(Uint8 *data);
 	static SdlDraw *getInstance();
 private:
@@ -15,7 +15,5 @@ private:
 	SDL_Renderer *_renderer;
 
 	int _frameWidth, _frameHeight;
-
-	static SdlDraw *m_instance;
 };
 

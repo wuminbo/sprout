@@ -1,5 +1,8 @@
 #include "SdlDraw.h"
 
+
+static SdlDraw* m_instance = nullptr;
+
 SdlDraw::SdlDraw(void)
 {
 }
@@ -9,7 +12,7 @@ SdlDraw::~SdlDraw(void)
 {
 }
 
-void SdlDraw::init(const char *title = "sprout", const int width = 300, const int height = 300)
+void SdlDraw::init(const char *title = "sprout", const int width = 500, const int height = 500)
 {
 	_frameWidth = 300;
 	_frameHeight = 300;
