@@ -21,9 +21,15 @@
     <ClCompile Include="..\..\src\application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="SdlDraw.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\application.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="SdlDraw.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

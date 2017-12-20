@@ -13,9 +13,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\src\application.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SdlDraw.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\application.h" />
+    <ClInclude Include="SdlDraw.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{EC6E796A-C713-4CB5-9054-4F7C9E5E2456}</ProjectGuid>
