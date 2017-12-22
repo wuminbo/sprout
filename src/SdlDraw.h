@@ -6,7 +6,7 @@ class SdlDraw
 public:
 	SdlDraw(void);
 	~SdlDraw(void);
-	void init(const char *title, const int width, const int height);
+	void init(const char *title, const int screen_width, const int screen_height);
 	void draw(Uint8 *data);
 	static SdlDraw *getInstance();
 private:

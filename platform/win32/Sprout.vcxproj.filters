@@ -18,19 +18,19 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\application.cpp">
+    <ClCompile Include="..\..\src\SdlDraw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="SdlDraw.cpp">
+    <ClCompile Include="..\..\src\application.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\application.h">
+    <ClInclude Include="..\..\src\SdlDraw.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="SdlDraw.h">
-      <Filter>头文件</Filter>
+    <ClInclude Include="..\..\src\application.h">
+      <Filter>源文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
