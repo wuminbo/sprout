@@ -9,7 +9,7 @@ int frame_width = 300;
 int frame_height = 300;
 
 POLYF_4D poly1;
-
+RENDER_LIST_4D render_list;
 
 
 void init()
@@ -35,7 +35,7 @@ void loop()
 {
 	static float ang_y = 0;
 	static MAT_4X4 rot_mat; 
-	
+
 }
 
 void GameMain()
