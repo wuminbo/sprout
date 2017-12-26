@@ -10,7 +10,7 @@ int frame_height = 300;
 
 POLYF_4D poly1;
 RENDER_LIST_4D render_list;
-
+CAM_4D cam;
 
 void init()
 {
@@ -36,6 +36,30 @@ void loop()
 	static float ang_y = 0;
 	static MAT_4X4 rot_mat; 
 
+	clearRenderList(&render_list);
+
+	insertPoly4dToRenderList(&render_list, &poly1);
+
+	buildXYZRotationMat4X4(0, ang_y, 0, &rot_mat);
+
+	transformRenderList(&render_list, &rot_mat);
+
+	TransModelToWorldCoor(&render_list, &poly1_pos);
+
+	buildCame4DMatrixEuler(&cam);
+
+	worldToCameraRenderList(&render_list, &cam);
+
+	cameraToPerspectiveRenderList(&render_list, &cam);
+
+	perspectiveToScreenRenderList(&render_list, &cam);
+
+	fillFrameBuff(&render_list, frameData);
+
+	SdlDraw::getInstance()->draw(frameData);
+
+	if (++ang_y >= 360.0)
+		ang_y = 0;
 }
 
 void GameMain()
@@ -46,7 +70,6 @@ void GameMain()
     while (1)  
     {  
 		
-		SdlDraw::getInstance()->draw(frameData);
        
     }  
   

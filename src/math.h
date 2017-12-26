@@ -32,7 +32,7 @@ typedef struct POLYF_4D_TYPE
 
 typedef struct MAT_4X4_TYPE
 {
-	float mat[4][4];
+	float M[4][4];
 } MAT_4X4, *MAT_4X4_PTR;
 
 typedef struct OBJ_4D_TYPE
@@ -52,8 +52,8 @@ typedef struct RENDER_4D_LIST_TYPE
 
 	int poly_num;
 
-	POLYF_4D poly_list[MAX_RENDER_LIST_POLYS];
-	POLYF_4D_PTR poly_ptr_list[MAX_RENDER_LIST_POLYS];
+	POLYF_4D poly_data[MAX_RENDER_LIST_POLYS];
+	POLYF_4D_PTR poly_ptr[MAX_RENDER_LIST_POLYS];
 } RENDER_4D_LIST, *RENDER_4D_LIST_PTR;
 
 typedef struct PLANE_3D_TYPE
@@ -105,6 +105,12 @@ typedef struct CAM_4D_TYPE
 } CAM_4D, *CAM_4D_PTR;
 
 
+const MAT_4X4 IMAT_4X4 = { 1,0,0,0,
+						   0,1,0,0,
+						   0,0,1,0,
+						   0,0,0,1,};
+
+
 void clearRenderList(RENDER_4D_LIST *render_list);
 
 void insertPoly4dToRenderList(RENDER_4D_LIST *render_list, POLYF_4D poly);
@@ -122,6 +128,17 @@ void worldToCameraRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam);
 void cameraToPerspectiveRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam);
 
 void perspectiveToScreenRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam);
+
+void fillFrameBuff(RENDER_4D_LIST_PTR render_list, Uint8 *frameData);
+
+void identityMat4X4(MAT_4X4_PTR mat);
+
+void initMat4X4(MAT_4X4_PTR mat, float m00, float m01, float m02, float m03,
+								 float m10, float m11, float m12, float m13,
+								 float m20, float m21, float m22, float m23,
+								 float m30, float m31, float m32, float m33);
+
+void mulMat4X4(mat)
 
 
 #endif

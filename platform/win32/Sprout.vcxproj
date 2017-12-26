@@ -12,11 +12,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\application.cpp" />
+    <ClCompile Include="..\..\src\math.cpp" />
     <ClCompile Include="..\..\src\SdlDraw.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\application.h" />
+    <ClInclude Include="..\..\src\math.h" />
     <ClInclude Include="..\..\src\SdlDraw.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
