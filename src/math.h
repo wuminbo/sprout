@@ -138,7 +138,8 @@ void initMat4X4(MAT_4X4_PTR mat, float m00, float m01, float m02, float m03,
 								 float m20, float m21, float m22, float m23,
 								 float m30, float m31, float m32, float m33);
 
-void mulMat4X4(mat)
+void mulMat4X4(MAT_4X4_PTR m1, MAT_4X4_PTR m2, MAT_4X4_PTR m);
 
+void mat4X4MulVerctor4D(VECTOR_4D *vector, MAT_4X4 *mat, )
 
 #endif

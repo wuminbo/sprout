@@ -69,7 +69,7 @@ void GameMain()
 
     while (1)  
     {  
-		
+		loop()
        
     }  
   

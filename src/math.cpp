@@ -7,11 +7,11 @@ void clearRenderList(RENDER_4D_LIST *render_list)
 
 void insertPoly4dToRenderList(RENDER_4D_LIST *render_list, POLYF_4D *poly)
 {
-	int polys_num = render_list->poly_num;
+	int poly_num = render_list->poly_num;
 
-	render_list->poly_ptr[polys_num] = &render_list->poly_data[polys_num];
+	render_list->poly_ptr[poly_num] = &render_list->poly_data[poly_num];
 
-	memcpy((void *)&render_list->poly_data[polys_num], (void *)poly);
+	memcpy((void *)&render_list->poly_data[poly_num], (void *)poly);
 
 	render_list->poly_num++;
 }
@@ -54,7 +54,17 @@ void buildXYZRotationMat4X4(float theta_x, float theta_y,float theta_z, MAT_4X4_
 
 void transformRenderList(RENDER_4D_LIST_PTR render_list, MAT_4X4_PTR mat)
 {
-	
+	for (int index = 0; index < render_list->poly_num; index++)
+	{
+		POLYF_4D_PTR poly = render_list->poly_ptr[index];
+
+		for (int vertex = 0; vertex < 3; vertex++)
+		{
+			POINT_4D res_point;
+
+			
+		}
+	}
 }
 
 void TransModelToWorldCoor(RENDER_4D_LIST_PTR, render_list, POINT_4D_PTR pos)
