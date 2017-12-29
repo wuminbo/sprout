@@ -29,6 +29,8 @@ void init()
     poly1.vlist[2].y = -50;
     poly1.vlist[2].z = 0;
     poly1.vlist[2].w = 1;
+
+    initCamera(&cam, &cam_pos, &cam_dir, NULL, 50.0, 500.0, 90.0, frame_width, frame_height);
 }
 
 void loop()

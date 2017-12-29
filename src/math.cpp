@@ -62,14 +62,24 @@ void transformRenderList(RENDER_4D_LIST_PTR render_list, MAT_4X4_PTR mat)
 		{
 			POINT_4D res_point;
 
-			
+			mat4X4MulVerctor4D(&poly->vlist[vertex], mat, &res_point);
+
+			vector4dCopy(&poly->vlist[vertex], &res_point);
 		}
 	}
 }
 
-void TransModelToWorldCoor(RENDER_4D_LIST_PTR, render_list, POINT_4D_PTR pos)
+void TransModelToWorldCoor(RENDER_4D_LIST_PTR render_list, POINT_4D_PTR pos)
 {
-	
+	for (int index = 0; index < render_list->poly_num; index++)
+	{
+		POLYF_4D_PTR poly_ptr = render_list->poly_ptr[index];
+
+		for (int k = 0; k < 3; k++)
+		{
+			vector4dAdd(&poly_ptr->tvlist[k], wold_pos, &poly_ptr->tvlist[k]);
+		}
+	} 
 }
 
 void buildCame4DMatrixEuler(CAM_4D_PTR cam)
@@ -125,4 +135,35 @@ void mulMat4X4(MAT_4X4_PTR ma, MAT_4X4_PTR ma, MAT_4X4_PTR dis_m)
 			}
 			dis_m->M[row][rol] = sum;
 		}
+}
+
+void mat4X4MulVerctor4D(VECTOR_4D *v, MAT_4X4 *mat, VECTOR_4D *dis_vt)
+{
+	for (int col = 0; col < 4; col++)
+	{
+		float sum = 0;
+
+		for (int row = 0; row < 4; row++)
+		{
+			sum += (v->M[row] * mat->M[row][col]);
+		}
+
+		dis_vt->M[col] = sum;
+	}
+}
+
+void initCamera(CAM_4D *cam, 
+				POINT_4D *pos, 
+				VECTOR_4D *dir, 
+				POINT_4D *tar, 
+				float near_clip_z,
+				float far_clip_z, 
+				float fov, 
+				float view_port_width, 
+				float view_port_height)
+{
+	vector4dCopy(&cam->pos, pos);
+	vector4dCopy(&cam->dir, dir);
+
+	
 }

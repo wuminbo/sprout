@@ -140,6 +140,38 @@ void initMat4X4(MAT_4X4_PTR mat, float m00, float m01, float m02, float m03,
 
 void mulMat4X4(MAT_4X4_PTR m1, MAT_4X4_PTR m2, MAT_4X4_PTR m);
 
-void mat4X4MulVerctor4D(VECTOR_4D *vector, MAT_4X4 *mat, )
+void mat4X4MulVerctor4D(VECTOR_4D *vector, MAT_4X4 *mat, VECTOR_4D *dis_vt);
+
+inline void vector4dCopy(VECTOR_4D *dis_v, VECTOR_4D *src_v)
+{
+	dis_v->x = src_v->x; dis_v->y = src_v->y; 
+	dis_v->z = src_v->z; dis_v->w = src_v->w;
+}
+
+inline void vector4dAdd(VECTOR_4D *dis_v, VECTOR_4D *va, VECTOR_4D *vb)
+{
+	dis_v->x = va->x + vb->x; dis_v->y = va->y + vb->y; 
+	dis_v->z = va->z + vb->z; dis_v->w = va->w + vb->w;
+}
+
+inline void vectorInitXYZ(VECTOR_4D *v, float x, float y, float z)
+{
+	v->x = x; v->y = y; v->z = z;
+}
+
+inline void vectorZero(VECTOR_4D *v)
+{
+	v->x = v->y = v->z = 0;
+}
+void initCamera(CAM_4D *cam, 
+				POINT_4D *pos, 
+				VECTOR_4D *dir, 
+				POINT_4D *tar, 
+				float near_clip_z,
+				float far_clip_z, 
+				float fov, 
+				float view_port_width, 
+				float view_port_height);
+
 
 #endif
