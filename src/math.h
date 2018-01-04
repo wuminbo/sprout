@@ -3,6 +3,8 @@
 
 #define MAX_OBJ_VERTICES 1000
 #define MAX_RENDER_LIST_POLYS = 1000
+#define PI 3.141592654
+#define DEG_TO_RAD(angle) ((angle)*PI/180.0)
 typedef struct POINT_4D_TYPE
 {
 	int state;
@@ -148,6 +150,13 @@ inline void vector4dCopy(VECTOR_4D *dis_v, VECTOR_4D *src_v)
 	dis_v->z = src_v->z; dis_v->w = src_v->w;
 }
 
+inline void vector3dCopy(VECTOR_3D *dis_v, VECTOR_3D *src_v)
+{
+	dis_v->x = src_v->x; dis_v->y = src_v->y; 
+	dis_v->z = src_v->z;
+}
+
+
 inline void vector4dAdd(VECTOR_4D *dis_v, VECTOR_4D *va, VECTOR_4D *vb)
 {
 	dis_v->x = va->x + vb->x; dis_v->y = va->y + vb->y; 
@@ -163,6 +172,11 @@ inline void vectorZero(VECTOR_4D *v)
 {
 	v->x = v->y = v->z = 0;
 }
+
+void initPlane3d(PLANE_3D_PTR plane, POINT_3D_PTR pt, VECTOR_3D_PTR normal);
+
+void vector3dNormalize(VECTOR_3D_PTR v);
+
 void initCamera(CAM_4D *cam, 
 				POINT_4D *pos, 
 				VECTOR_4D *dir, 

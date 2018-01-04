@@ -152,6 +152,26 @@ void mat4X4MulVerctor4D(VECTOR_4D *v, MAT_4X4 *mat, VECTOR_4D *dis_vt)
 	}
 }
 
+
+void vector3dNormalize(VECTOR_3D_PTR v)
+{
+	float len = sqrt(v->x*v->x + v->y*v->y + v->z*v->z);
+
+	if(len <= 0) 
+		return;
+
+	float len_rev = 1/len;
+
+	v->x *= len_rev;
+	v->y *= len_rev;
+	v->z *= len_rev;
+}
+
+void initPlane3d(PLANE_3D_PTR plane, POINT_3D_PTR pt, VECTOR_3D_PTR normal)
+{
+	vector3dCopy(&plane->p, pt);
+	vector3dCopy(&plane->n, normal);	
+}
 void initCamera(CAM_4D *cam, 
 				POINT_4D *pos, 
 				VECTOR_4D *dir, 
@@ -165,5 +185,58 @@ void initCamera(CAM_4D *cam,
 	vector4dCopy(&cam->pos, pos);
 	vector4dCopy(&cam->dir, dir);
 
-	
+	vectorInitXYZ(&cam->u, 1,0,0);
+	vectorInitXYZ(&cam->v, 0,1,0);
+	vectorInitXYZ(&cam->n, 0,0,1);
+
+	vectorZero(&cam->target);
+
+	cam->near_clip_z = near_clip_z;
+	cam->far_clip_z = far_clip_z;
+
+	cam->view_port_width = view_port_width;
+	cam->view_port_height = view_port_height;
+
+	cam->view_port_center_x = (view_port_width-1)/2;
+	cam->view_port_center_y = (view_port_height-1)/2;
+
+	cam->aspect_ratio = (float)view_port_width/(float)view_port_height;
+
+	identityMat4X4(&cam->cam_mat);
+	identityMat4X4(&cam->per_mat);
+	identityMat4X4(&cam->scr_mat);
+
+	cam->fov = fov;
+
+	cam->view_plane_width = 2.0;
+	cam->view_plane_height = 2.0/cam->aspect_ratio;
+
+	float tan_fov_div2 = tan(DEG_TO_RAD(fov/2));
+
+	cam->view_dist = (0.5)*(cam->view_plane_width) * tan_fov_div2;
+
+	if(fov == 90.0)
+	{
+		POINT_3D org_pt;
+		vectorInitXYZ(&org_pt, 0,0,0);
+
+		VECTOR_3D vn;
+
+		vectorInitXYZ(&vn, 1,0,-1);
+		initPlane3d(&cam->r_clip_plane, &org_pt, &vn);
+		vector3dNormalize(&cam->r_clip_plane->n);
+
+		vectorInitXYZ(&vn, -1,0,-1);
+		initPlane3d(&cam->l_clip_plane, &org_pt, &vn);
+		vector3dNormalize(*cam->l_clip_plane->n);
+
+		vectorInitXYZ(&vn, 0,1,-1);
+		initPlane3d(&cam->t_clip_plane, &org_pt, &vn);
+		vector3dNormalize(&cam->t_clip_plane->n);
+
+		vectorInitXYZ(&vn, 0,-1,-1);
+		initPlane3d(&cam->b_clip_plane, &org_pt, &vn);
+		vector3dNormalize(&cam->b_clip_plane->n);
+	}
+
 }
