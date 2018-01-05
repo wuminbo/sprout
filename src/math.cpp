@@ -335,7 +335,7 @@ void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData)
 {
 	frameData[x + y*lpitch] = color;
 }
-void drawLine(int x0, int y0, int x1, int y1, color, int lpitch, Uint8 *frameData)
+void drawLine(int x0, int y0, int x1, int y1, Uint8 color, int lpitch, Uint8 *frameData)
 {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);

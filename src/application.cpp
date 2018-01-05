@@ -67,13 +67,13 @@ void loop()
 void GameMain()
 {
 
-	init()
+	init();
 
-    while (1)  
+    while(1)  
     {  
-		loop()
+		loop();
        
-    }  
+    };
   
     free(frameData);
     SDL_Quit();  

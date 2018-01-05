@@ -2,7 +2,7 @@
 #define __MATH__H__
 
 #define MAX_OBJ_VERTICES 1000
-#define MAX_RENDER_LIST_POLYS = 1000
+#define MAX_RENDER_LIST_POLYS 1000
 #define PI 3.141592654
 #define DEG_TO_RAD(angle) ((angle)*PI/180.0)
 typedef struct POINT_4D_TYPE
@@ -121,7 +121,7 @@ void buildXYZRotationMat4X4(float theta_x, float theta_y,float theta_z, MAT_4X4_
 
 void transformRenderList(RENDER_4D_LIST_PTR render_list, MAT_4X4_PTR mat);
 
-void TransModelToWorldCoor(RENDER_4D_LIST_PTR, render_list, POINT_4D_PTR pos);
+void TransModelToWorldCoor(RENDER_4D_LIST_PTR render_list, POINT_4D_PTR pos);
 
 void buildCame4DMatrixEuler(CAM_4D_PTR cam);
 
@@ -190,5 +190,5 @@ void initCamera(CAM_4D *cam,
 
 void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData);
 
-void drawLine(int x0, int y0, int x1, int y1, color, Uint8 *frameData);
+void drawLine(int x0, int y0, int x1, int y1,Uint8 color, Uint8 *frameData);
 #endif
