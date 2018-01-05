@@ -188,4 +188,7 @@ void initCamera(CAM_4D *cam,
 				float view_port_height);
 
 
+void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData);
+
+void drawLine(int x0, int y0, int x1, int y1, color, Uint8 *frameData);
 #endif

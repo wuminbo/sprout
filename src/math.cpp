@@ -84,27 +84,117 @@ void TransModelToWorldCoor(RENDER_4D_LIST_PTR render_list, POINT_4D_PTR pos)
 
 void buildCame4DMatrixEuler(CAM_4D_PTR cam)
 {
+	MAT_4X4 mt_inv, mx_inv, my_inv, mz_inv, mrot, mtmp;
 	
+	initMat4X4(&mt_inv, 1,	0,	0,	0,
+						0,	1,	0,	0,
+						0,	0,	1,	0,
+						-cam->pos.x, -cam->pos.y, -cam->pos.z, 1);
+
+	float theta_x = cam->dir.x;
+	float theta_y = cam->dir.y;
+	float theta_z = cam->dir.z;
+
+	float cos_theta = cos(theta_x);
+	float sin_theta = sin(theta_x);
+
+	initMat4X4(&mx_inv, 1,		0,			0,			0,
+						0,		cos_theta, 	sin_theta,  0,
+						0,		-sin_theta, cos_theta,  0,
+						0,		0,			0,		 	-1);
+
+	cos_theta = cos(theta_y);
+	sin_theta = sin(theta_y);
+
+	initMat4X4(&my_inv, cos_theta,		0,		-sin_theta,	0,
+						0,				1,		0,			0,
+						sin_theta,		0,		cos_theta,	0,
+						0,				0,		0,			1);
+
+	cos_theta = cos(theta_z);
+	sin_theta = sin(theta_z);
+
+	initMat4X4(&mz_inv, cos_theta,	sin_theta,	0,	0,
+						-sin_theta, cos_theta,	0,	0,
+						0,			0,			1,	0,
+						0,			0,			0,	1);
+
+	mulMat4X4(&mz_inv, &my_inv, &mtmp);
+	mulMat4X4(&mtmp, &mz_inv, &mrot);
+
+	mulMat4X4(&mt_inv, &mrot, &cam->cam_mat);	
 }
 
 void worldToCameraRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam)
 {
-	
+	for (int poly; poly < render_list->poly_num; poly++)
+	{
+		POLYF_4D_PTR cur_poly = render_list->poly_ptr[poly];
+
+		for (int vertex = 0; vertex < 3; vertex++)
+		{
+			POINT_4D point;
+
+			mat4X4MulVerctor4D(&cur_poly->tvlist[vertex], &cam->cam_mat, &point);
+			vector4dCopy(&cur_poly->tvlist[vertex], &point);
+		}
+	}	
 }
 
 void cameraToPerspectiveRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam)
 {
-	
+	for (int poly; poly < render_list->poly_num; poly++)
+	{
+		POLYF_4D_PTR cur_poly = render_list->poly_ptr[poly];
+
+		for (int vertex = 0; vertex < 3; vertex++)
+		{
+			float z = cur_poly->tvlist[vertex].z;
+			cur_poly->tvlist[vertex].x = cam->view_dist*cur_poly->tvlist[vertex].x/z;
+			cur_poly->tvlist[vertex].y = cam->view_dist*cur_poly->tvlist[vertex].y/z*cam->aspect_ratio;
+		}
+	}	
 }
 
 void perspectiveToScreenRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR cam)
 {
-	
+	for (int poly; poly < render_list->poly_num; poly++)
+	{
+		POLYF_4D_PTR cur_poly = render_list->poly_ptr[poly];
+
+		float alpha = 0.5*cam->view_port_width - 0.5;
+		float beta  = 0.5*cam->view_port_height - 0.5;
+
+		for (int vertex = 0; vertex < 3; vertex++)
+		{	
+			float z = cur_poly->tvlist[vertex].z;
+
+			cur_poly->tvlist[vertex].x = cam->view_dist * cur_poly->tvlist[vertex].x / z;
+			cur_poly->tvlist[vertex].y = cam->view_dist * cur_poly->tvlist[vertex].y /z;
+
+			cur_poly->tvlist[vertex].x = cur_poly->tvlist[vertex].x + alpha;
+			cur_poly->tvlist[vertex].y = cur_poly->tvlist[vertex].y + beta;
+		}
+	}
 }
 
-void fillFrameBuff(RENDER_4D_LIST_PTR render_list, Uint8 *frameData)
+void fillFrameBuff(RENDER_4D_LIST_PTR render_list, int lpitch, Uint8 *frameData)
 {
+	for (int poly; poly < render_list->poly_num; poly++)
+	{
+		POLYF_4D_PTR cur_poly = render_list[poly];
+		
 
+		drawLine(cur_poly->tvlist[0].x, cur_poly->tvlist[0].y,
+				 cur_poly->tvlist[1].x, cur_poly->tvlist[1].y,
+				 color, lpitch, frameData);	
+		drawLine(cur_poly->tvlist[1].x, cur_poly->tvlist[1].y,
+				 cur_poly->tvlist[2].x, cur_poly->tvlist[2].y,
+				 color, lpitch, frameData);	
+		drawLine(cur_poly->tvlist[2].x, cur_poly->tvlist[2].y,
+				 cur_poly->tvlist[0].x, cur_poly->tvlist[0].y,
+				 color, lpitch, frameData);	
+	}	
 }
 
 void identityMat4X4(MAT_4X4_PTR mat)
@@ -239,4 +329,62 @@ void initCamera(CAM_4D *cam,
 		vector3dNormalize(&cam->b_clip_plane->n);
 	}
 
+}
+
+void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData)
+{
+	frameData[x + y*lpitch] = color;
+}
+void drawLine(int x0, int y0, int x1, int y1, color, int lpitch, Uint8 *frameData)
+{
+	int dx = abs(x1 - x0);
+	int dy = abs(y1 - y0);
+
+	if (dx >= dy)
+	{
+		if (x1 < x0)
+		{
+			swap(x1, x0);
+			swap(y1, y0);
+		}
+		int flag = y1 >= y0? 1 : -1;
+		int k = flag * (dy << 1);
+		int e = -dx * flag;
+
+		for (int x = x0, y = y0; x <= x1; ++x)
+		{
+			drawPixel(x, y, color, lpitch, frameData);
+
+			e += k;
+			if (flag * e > 0)
+			{
+				y += flag;
+				e -= (dx << 1) * flag;
+			}
+		}
+	}
+	else
+	{
+		if (y1 < y0)
+		{
+			swap(x0, x1);
+			swap(y0, y1);
+		}
+
+		int flag = x1 > x0? 1:-1;
+		int k = flag * (dx << 1);
+		int e = -dy * flag;
+
+		for (int x = x0, y = y0; y <= y1; ++y)
+		{
+			drawPixel(x, y, color, lpitch, frameData);
+
+			e += k;
+			if (flag * e > 0)
+			{
+				x + flag;
+				e -= (dy << 1) * flag;
+			}
+		}
+	}
 }
