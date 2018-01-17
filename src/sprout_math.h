@@ -1,5 +1,6 @@
-#ifndef __MATH__H__
-#define __MATH__H__
+#ifndef __SPROUT_MATH__H__
+#define __SPROUT_MATH__H__
+#include "SdlDraw.h"
 
 #define MAX_OBJ_VERTICES 1000
 #define MAX_RENDER_LIST_POLYS 1000
@@ -7,10 +8,14 @@
 #define DEG_TO_RAD(angle) ((angle)*PI/180.0)
 typedef struct POINT_4D_TYPE
 {
-	int state;
-	int attr;
-
-	int x, y, z, w;
+	union
+	{
+		struct
+		{
+			float x, y, z, w;
+		};
+		float M[4]; 
+	};
 } POINT_4D, *POINT_4D_PTR, VECTOR_4D, *VECTOR_4D_PTR;
 
 typedef struct POINT_3D_TYPE
@@ -43,7 +48,7 @@ typedef struct OBJ_4D_TYPE
 	int attr;
 
 	POINT_4D wold_pos;
-	POLYF_4D[MAX_OBJ_VERTICES];
+	POLYF_4D obj[MAX_OBJ_VERTICES];
 
 } OBJ_4D, *OBJ_4D_PTR;
 
@@ -69,7 +74,7 @@ typedef struct CAM_4D_TYPE
 	int state;
 	int attr;
 
-	POLYF_4D pos;
+	POINT_4D pos;
 
 	VECTOR_4D dir;
 
@@ -115,7 +120,7 @@ const MAT_4X4 IMAT_4X4 = { 1,0,0,0,
 
 void clearRenderList(RENDER_4D_LIST *render_list);
 
-void insertPoly4dToRenderList(RENDER_4D_LIST *render_list, POLYF_4D poly);
+void insertPoly4dToRenderList1(RENDER_4D_LIST *render_list, POLYF_4D poly);
 
 void buildXYZRotationMat4X4(float theta_x, float theta_y,float theta_z, MAT_4X4_PTR rot_mat);
 
@@ -163,11 +168,15 @@ inline void vector4dAdd(VECTOR_4D *dis_v, VECTOR_4D *va, VECTOR_4D *vb)
 	dis_v->z = va->z + vb->z; dis_v->w = va->w + vb->w;
 }
 
-inline void vectorInitXYZ(VECTOR_4D *v, float x, float y, float z)
+inline void vectorInitXYZ(VECTOR_3D *v, float x, float y, float z)
 {
 	v->x = x; v->y = y; v->z = z;
 }
-
+inline void vector4dInitXYZ(VECTOR_4D *v, float x, float y, float z)
+{
+	v->x = x; v->y = y; 
+	v->z = z; v->w = 1.0;
+}
 inline void vectorZero(VECTOR_4D *v)
 {
 	v->x = v->y = v->z = 0;
@@ -188,7 +197,7 @@ void initCamera(CAM_4D *cam,
 				float view_port_height);
 
 
-void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData);
+void drawPixel(int x, int y, int color, int lpitch, int *frameData);
 
-void drawLine(int x0, int y0, int x1, int y1,Uint8 color, Uint8 *frameData);
+void drawLine(int x0, int y0, int x1, int y1,int color, int lpitch, Uint8 *frameData);
 #endif

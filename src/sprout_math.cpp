@@ -1,5 +1,6 @@
 #include<math.h>
-
+#include "sprout_math.h"
+#include<string.h>
 void clearRenderList(RENDER_4D_LIST *render_list)
 {
 	render_list->poly_num = 0;
@@ -11,7 +12,7 @@ void insertPoly4dToRenderList(RENDER_4D_LIST *render_list, POLYF_4D *poly)
 
 	render_list->poly_ptr[poly_num] = &render_list->poly_data[poly_num];
 
-	memcpy((void *)&render_list->poly_data[poly_num], (void *)poly);
+	memcpy((void *)&render_list->poly_data[poly_num], (void *)poly, sizeof(poly));
 
 	render_list->poly_num++;
 }
@@ -69,7 +70,7 @@ void transformRenderList(RENDER_4D_LIST_PTR render_list, MAT_4X4_PTR mat)
 	}
 }
 
-void TransModelToWorldCoor(RENDER_4D_LIST_PTR render_list, POINT_4D_PTR pos)
+void TransModelToWorldCoor(RENDER_4D_LIST_PTR render_list, POINT_4D_PTR wold_pos)
 {
 	for (int index = 0; index < render_list->poly_num; index++)
 	{
@@ -178,11 +179,11 @@ void perspectiveToScreenRenderList(RENDER_4D_LIST_PTR render_list, CAM_4D_PTR ca
 	}
 }
 
-void fillFrameBuff(RENDER_4D_LIST_PTR render_list, int lpitch, Uint8 *frameData)
+void fillFrameBuff(RENDER_4D_LIST_PTR render_list, int lpitch, int color, Uint8 *frameData)
 {
 	for (int poly; poly < render_list->poly_num; poly++)
 	{
-		POLYF_4D_PTR cur_poly = render_list[poly];
+		POLYF_4D_PTR cur_poly = render_list->poly_ptr[poly];
 		
 
 		drawLine(cur_poly->tvlist[0].x, cur_poly->tvlist[0].y,
@@ -199,7 +200,7 @@ void fillFrameBuff(RENDER_4D_LIST_PTR render_list, int lpitch, Uint8 *frameData)
 
 void identityMat4X4(MAT_4X4_PTR mat)
 {
-	memcpy((void *)m, (void *)&IMAT_4X4, sizeof(MAT_4X4));
+	memcpy((void *)mat, (void *)&IMAT_4X4, sizeof(MAT_4X4));
 }
 void initMat4X4(MAT_4X4_PTR mat, float m00, float m01, float m02, float m03,
 								 float m10, float m11, float m12, float m13,
@@ -212,7 +213,7 @@ void initMat4X4(MAT_4X4_PTR mat, float m00, float m01, float m02, float m03,
 	mat->M[3][0] = m30;mat->M[3][1] = m31;mat->M[3][2] = m32;mat->M[3][3] = m33;
 }
 
-void mulMat4X4(MAT_4X4_PTR ma, MAT_4X4_PTR ma, MAT_4X4_PTR dis_m)
+void mulMat4X4(MAT_4X4_PTR ma, MAT_4X4_PTR mb, MAT_4X4_PTR dis_m)
 {
 	for (int row = 0; row < 4; row++)
 		for (int col = 0; col < 4; col++)
@@ -223,7 +224,7 @@ void mulMat4X4(MAT_4X4_PTR ma, MAT_4X4_PTR ma, MAT_4X4_PTR dis_m)
 			{
 				sum += (ma->M[row][index] * mb->M[index][col]);
 			}
-			dis_m->M[row][rol] = sum;
+			dis_m->M[row][col] = sum;
 		}
 }
 
@@ -245,7 +246,7 @@ void mat4X4MulVerctor4D(VECTOR_4D *v, MAT_4X4 *mat, VECTOR_4D *dis_vt)
 
 void vector3dNormalize(VECTOR_3D_PTR v)
 {
-	float len = sqrt(v->x*v->x + v->y*v->y + v->z*v->z);
+	float len = sqrt(float(v->x*v->x + v->y*v->y + v->z*v->z));
 
 	if(len <= 0) 
 		return;
@@ -275,9 +276,9 @@ void initCamera(CAM_4D *cam,
 	vector4dCopy(&cam->pos, pos);
 	vector4dCopy(&cam->dir, dir);
 
-	vectorInitXYZ(&cam->u, 1,0,0);
-	vectorInitXYZ(&cam->v, 0,1,0);
-	vectorInitXYZ(&cam->n, 0,0,1);
+	vector4dInitXYZ(&cam->u, 1,0,0);
+	vector4dInitXYZ(&cam->v, 0,1,0);
+	vector4dInitXYZ(&cam->n, 0,0,1);
 
 	vectorZero(&cam->target);
 
@@ -314,19 +315,19 @@ void initCamera(CAM_4D *cam,
 
 		vectorInitXYZ(&vn, 1,0,-1);
 		initPlane3d(&cam->r_clip_plane, &org_pt, &vn);
-		vector3dNormalize(&cam->r_clip_plane->n);
+		vector3dNormalize(&cam->r_clip_plane.n);
 
 		vectorInitXYZ(&vn, -1,0,-1);
 		initPlane3d(&cam->l_clip_plane, &org_pt, &vn);
-		vector3dNormalize(*cam->l_clip_plane->n);
+		vector3dNormalize(&cam->l_clip_plane.n);
 
 		vectorInitXYZ(&vn, 0,1,-1);
 		initPlane3d(&cam->t_clip_plane, &org_pt, &vn);
-		vector3dNormalize(&cam->t_clip_plane->n);
+		vector3dNormalize(&cam->t_clip_plane.n);
 
 		vectorInitXYZ(&vn, 0,-1,-1);
 		initPlane3d(&cam->b_clip_plane, &org_pt, &vn);
-		vector3dNormalize(&cam->b_clip_plane->n);
+		vector3dNormalize(&cam->b_clip_plane.n);
 	}
 
 }
@@ -335,7 +336,14 @@ void drawPixel(int x, int y, int color, int lpitch, Uint8 *frameData)
 {
 	frameData[x + y*lpitch] = color;
 }
-void drawLine(int x0, int y0, int x1, int y1, Uint8 color, int lpitch, Uint8 *frameData)
+void swap(int *a, int *b)
+{
+	int tmp;
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
+void drawLine(int x0, int y0, int x1, int y1, int color, int lpitch, Uint8 *frameData)
 {
 	int dx = abs(x1 - x0);
 	int dy = abs(y1 - y0);
@@ -344,8 +352,8 @@ void drawLine(int x0, int y0, int x1, int y1, Uint8 color, int lpitch, Uint8 *fr
 	{
 		if (x1 < x0)
 		{
-			swap(x1, x0);
-			swap(y1, y0);
+			swap(&x1, &x0);
+			swap(&y1, &y0);
 		}
 		int flag = y1 >= y0? 1 : -1;
 		int k = flag * (dy << 1);
@@ -367,8 +375,8 @@ void drawLine(int x0, int y0, int x1, int y1, Uint8 color, int lpitch, Uint8 *fr
 	{
 		if (y1 < y0)
 		{
-			swap(x0, x1);
-			swap(y0, y1);
+			swap(&x0, &x1);
+			swap(&y0, &y1);
 		}
 
 		int flag = x1 > x0? 1:-1;
